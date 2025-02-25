@@ -63,7 +63,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
     "d3-array": "^3.2.4",
-    "deepmerge-ts": "^5.1.0",
+    "deepmerge-ts": "^7.1.4",
     "fetch-retry": "^5.0.6",
     "jsbi": "^3.2.5",
     "lucide-react": "^0.454.0",
