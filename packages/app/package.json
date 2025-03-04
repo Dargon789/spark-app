@@ -47,7 +47,7 @@
     "@size-limit/file": "^11.1.6",
     "@tanstack/react-query": "^5.28.6",
     "@tanstack/react-table": "^8.10.7",
-    "@viem/anvil": "^0.0.6",
+    "@viem/anvil": "^0.0.10",
     "@visx/annotation": "^3.3.0",
     "@visx/axis": "^3.8.0",
     "@visx/curve": "^3.3.0",
