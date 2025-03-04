@@ -65,7 +65,7 @@
     "d3-array": "^3.2.4",
     "deepmerge-ts": "^7.1.4",
     "fetch-retry": "^5.0.6",
-    "jsbi": "^3.2.5",
+    "jsbi": "^4.3.0",
     "lucide-react": "^0.454.0",
     "react": "^19.0.0",
     "react-confetti": "^6.1.0",
