@@ -4,7 +4,7 @@ import { tokens } from '@sb/tokens'
 import { getMobileStory, getTabletStory } from '@sb/viewports'
 import { Meta, StoryObj } from '@storybook/react'
 import { withRouter } from 'storybook-addon-remix-react-router'
-import { mainnet } from 'viem/chains'
+import { arbitrum, mainnet } from 'viem/chains'
 import { RewardsView, RewardsViewProps } from './RewardsView'
 
 const meta: Meta<typeof RewardsView> = {
@@ -15,23 +15,25 @@ const meta: Meta<typeof RewardsView> = {
   },
   decorators: [WithTooltipProvider(), withRouter()],
   args: {
+    selectNetwork: () => {},
     ongoingCampaignsResult: {
       data: [
         {
           id: 'campaign-1',
           type: 'sparklend',
+          rewardChainId: mainnet.id,
           chainId: mainnet.id,
           shortDescription: 'Early Bird Rewards',
           longDescription: 'Earn rewards for being an early adopter',
           rewardTokenSymbol: tokens.SPK.symbol,
           involvedTokensSymbols: [tokens.sUSDS.symbol],
           restrictedCountryCodes: [],
-          engage: () => Promise.resolve(),
+          onEngageButtonClick: () => Promise.resolve(),
         },
         {
           id: 'campaign-2',
           type: 'social',
-          chainId: mainnet.id,
+          rewardChainId: mainnet.id,
           platform: 'x',
           link: 'https://x.com/marsfoundation',
           shortDescription: 'Social Media Rewards',
@@ -39,34 +41,70 @@ const meta: Meta<typeof RewardsView> = {
           rewardTokenSymbol: tokens.SPK.symbol,
           involvedTokensSymbols: [],
           restrictedCountryCodes: [],
-          engage: () => Promise.resolve(),
+          onEngageButtonClick: () => Promise.resolve(),
         },
       ],
       isPending: false,
       isError: false,
       error: null,
     },
-    activeRewardsResult: {
+    claimableRewardsResult: {
       data: [
         {
           token: tokens.RED,
           amountPending: NormalizedUnitNumber(123.4323),
           amountToClaim: NormalizedUnitNumber(224_093.23423),
-          openClaimDialog: () => {},
+          chainId: mainnet.id,
+          actionName: 'Claim',
+          action: () => {},
+          isActionEnabled: true,
         },
         {
           token: tokens.SPK,
           amountPending: NormalizedUnitNumber(44_224.22),
           amountToClaim: NormalizedUnitNumber(12_213.21),
-          openClaimDialog: () => {},
+          chainId: mainnet.id,
+          actionName: 'Claim',
+          action: () => {},
+          isActionEnabled: true,
         },
         {
           token: tokens.USDS,
           amountPending: NormalizedUnitNumber(11.22),
           amountToClaim: NormalizedUnitNumber(0),
-          openClaimDialog: () => {},
+          chainId: arbitrum.id,
+          actionName: 'Switch',
+          action: () => {},
+          isActionEnabled: true,
         },
       ],
+      isPending: false,
+      isError: false,
+      error: null,
+    },
+    claimableRewardsSummaryResult: {
+      data: {
+        usdSum: NormalizedUnitNumber(1_465.59),
+        isClaimEnabled: true,
+        claimableRewardsWithPrice: [
+          {
+            token: tokens.SPK,
+            amountPending: NormalizedUnitNumber(44_224.22),
+            amountToClaim: NormalizedUnitNumber(12_213.21),
+            chainId: mainnet.id,
+          },
+        ],
+        claimableRewardsWithoutPrice: [
+          {
+            token: tokens.RED,
+            amountPending: NormalizedUnitNumber(123.4323),
+            amountToClaim: NormalizedUnitNumber(224_093.23423),
+            chainId: mainnet.id,
+          },
+        ],
+        claimAll: () => {},
+        chainId: mainnet.id,
+      },
       isPending: false,
       isError: false,
       error: null,
@@ -89,7 +127,13 @@ export const Loading: Story = {
       isError: false,
       error: null,
     },
-    activeRewardsResult: {
+    claimableRewardsResult: {
+      data: undefined,
+      isPending: true,
+      isError: false,
+      error: null,
+    },
+    claimableRewardsSummaryResult: {
       data: undefined,
       isPending: true,
       isError: false,
@@ -108,11 +152,17 @@ export const ErrorState: Story = {
       isError: true,
       error: new Error('Failed to load campaigns'),
     },
-    activeRewardsResult: {
+    claimableRewardsResult: {
       data: undefined,
       isPending: false,
       isError: true,
-      error: new Error('Failed to load active rewards'),
+      error: new Error('Failed to load claimable rewards'),
+    },
+    claimableRewardsSummaryResult: {
+      data: undefined,
+      isPending: false,
+      isError: true,
+      error: new Error('Failed to load claimable rewards'),
     },
   },
 }
@@ -132,42 +182,91 @@ export const NoCampaigns: Story = {
 export const NoCampaignsMobile = getMobileStory(NoCampaigns)
 export const NoCampaignsTablet = getTabletStory(NoCampaigns)
 
-export const NoActiveRewards: Story = {
+export const NoClaimableRewards: Story = {
   args: {
-    activeRewardsResult: {
+    claimableRewardsResult: {
       data: [],
+      isPending: false,
+      isError: false,
+      error: null,
+    },
+    claimableRewardsSummaryResult: {
+      data: {
+        usdSum: NormalizedUnitNumber(0),
+        isClaimEnabled: false,
+        claimableRewardsWithPrice: [],
+        claimableRewardsWithoutPrice: [],
+        chainId: mainnet.id,
+        claimAll: () => {},
+      },
       isPending: false,
       isError: false,
       error: null,
     },
   },
 }
-export const NoActiveRewardsMobile = getMobileStory(NoActiveRewards)
-export const NoActiveRewardsTablet = getTabletStory(NoActiveRewards)
+export const NoClaimableRewardsMobile = getMobileStory(NoClaimableRewards)
+export const NoClaimableRewardsTablet = getTabletStory(NoClaimableRewards)
 
 export const ZeroAmounts: Story = {
   args: {
-    activeRewardsResult: {
+    claimableRewardsResult: {
       data: [
         {
           token: tokens.RED,
           amountPending: NormalizedUnitNumber(0),
           amountToClaim: NormalizedUnitNumber(0),
-          openClaimDialog: () => {},
+          chainId: mainnet.id,
+          actionName: 'Claim',
+          action: () => {},
+          isActionEnabled: false,
         },
         {
           token: tokens.SPK,
           amountPending: NormalizedUnitNumber(0),
           amountToClaim: NormalizedUnitNumber(0),
-          openClaimDialog: () => {},
+          chainId: mainnet.id,
+          actionName: 'Claim',
+          action: () => {},
+          isActionEnabled: false,
         },
         {
           token: tokens.USDS,
           amountPending: NormalizedUnitNumber(0),
           amountToClaim: NormalizedUnitNumber(0),
-          openClaimDialog: () => {},
+          chainId: arbitrum.id,
+          actionName: 'Switch',
+          action: () => {},
+          isActionEnabled: true,
         },
       ],
+      isPending: false,
+      isError: false,
+      error: null,
+    },
+    claimableRewardsSummaryResult: {
+      data: {
+        usdSum: NormalizedUnitNumber(0),
+        isClaimEnabled: false,
+        claimableRewardsWithPrice: [
+          {
+            token: tokens.SPK,
+            amountPending: NormalizedUnitNumber(0),
+            amountToClaim: NormalizedUnitNumber(0),
+            chainId: mainnet.id,
+          },
+        ],
+        claimableRewardsWithoutPrice: [
+          {
+            token: tokens.RED,
+            amountPending: NormalizedUnitNumber(0),
+            amountToClaim: NormalizedUnitNumber(0),
+            chainId: mainnet.id,
+          },
+        ],
+        claimAll: () => {},
+        chainId: mainnet.id,
+      },
       isPending: false,
       isError: false,
       error: null,
@@ -185,8 +284,21 @@ export const Nothing: Story = {
       isError: false,
       error: null,
     },
-    activeRewardsResult: {
+    claimableRewardsResult: {
       data: [],
+      isPending: false,
+      isError: false,
+      error: null,
+    },
+    claimableRewardsSummaryResult: {
+      data: {
+        usdSum: NormalizedUnitNumber(0),
+        isClaimEnabled: false,
+        claimableRewardsWithPrice: [],
+        claimableRewardsWithoutPrice: [],
+        chainId: mainnet.id,
+        claimAll: () => {},
+      },
       isPending: false,
       isError: false,
       error: null,

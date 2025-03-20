@@ -1,6 +1,8 @@
 import { getChainConfigEntry } from '@/config/chain'
 import { TokenWithBalance, TokenWithValue } from '@/domain/common/types'
+import { useWalletType } from '@/domain/hooks/useWalletType'
 import { useSavingsAccountRepository } from '@/domain/savings/useSavingsAccountRepository'
+import { useSavingsTimestamps } from '@/domain/savings/useSavingsTimestamps'
 import { useTokenRepositoryForFeature } from '@/domain/token-repository/useTokenRepositoryForFeature'
 import { Token } from '@/domain/types/Token'
 import { InjectedActionsContext, Objective } from '@/features/actions/logic/types'
@@ -12,7 +14,7 @@ import {
 import { FormFieldsForDialog, PageState, PageStatus } from '@/features/dialogs/common/types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { raise } from '@marsfoundation/common-universal'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { UseFormReturn, useForm } from 'react-hook-form'
 import { useChainId } from 'wagmi'
 import { SavingsDialogTxOverview } from '../../common/types'
@@ -41,6 +43,14 @@ export function useSavingsDepositDialog({
   initialToken,
 }: UseSavingsDepositDialogParams): UseSavingsDepositDialogResults {
   const chainId = useChainId()
+  const walletType = useWalletType()
+  const { uiTimestamp, simulationTimestamp, refresh, isFetching } = useSavingsTimestamps({ chainId })
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+  useEffect(() => {
+    refresh()
+  }, [refresh, chainId])
+
   const chainConfig = getChainConfigEntry(chainId)
   const { tokenRepository } = useTokenRepositoryForFeature({ chainId, featureGroup: 'savings' })
   const selectedAccountConfig =
@@ -49,7 +59,9 @@ export function useSavingsDepositDialog({
   const supportedStablecoins = selectedAccountConfig.supportedStablecoins.map((symbol) =>
     tokenRepository.findOneTokenWithBalanceBySymbol(symbol),
   )
-  const savingsAccounts = useSavingsAccountRepository({ chainId })
+  const savingsAccounts = useSavingsAccountRepository({ chainId, timestamp: uiTimestamp })
+  const simulationSavingsAccounts = useSavingsAccountRepository({ chainId, timestamp: simulationTimestamp })
+
   const savingsAccount = savingsAccounts.findOneBySavingsToken(savingsToken)
 
   const [pageStatus, setPageStatus] = useState<PageState>('form')
@@ -95,7 +107,7 @@ export function useSavingsDepositDialog({
     token: formValues.token,
     value: formValues.value,
   }
-  const actionsEnabled = formValues.value.gt(0) && isFormValid && !isDebouncing
+  const actionsEnabled = formValues.value.gt(0) && isFormValid && !isDebouncing && !isFetching
 
   return {
     selectableAssets: supportedStablecoins,
@@ -112,7 +124,8 @@ export function useSavingsDepositDialog({
     },
     actionsContext: {
       tokenRepository,
-      savingsAccounts,
+      savingsAccounts: simulationSavingsAccounts,
+      walletType,
     },
   }
 }

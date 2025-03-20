@@ -1,10 +1,11 @@
 import { FarmsInfo } from '@/domain/farms/farmsInfo'
+import { WalletType } from '@/domain/hooks/useWalletType'
 import { WriteErrorKind } from '@/domain/hooks/useWrite'
 import { MarketInfo } from '@/domain/market-info/marketInfo'
-import { SavingsAccountRepository, SavingsConverter } from '@/domain/savings-converters/types'
+import { SavingsAccountRepository } from '@/domain/savings-converters/types'
 import { TokenRepository } from '@/domain/token-repository/TokenRepository'
 import { QueryKey, UseQueryOptions, UseQueryResult } from '@tanstack/react-query'
-import { Address, BlockTag, ContractFunctionParameters, TransactionReceipt } from 'viem'
+import { Address, ContractFunctionParameters, TransactionReceipt } from 'viem'
 import { Config } from 'wagmi'
 import { ApproveDelegationAction } from '../flavours/approve-delegation/types'
 import { ApproveAction } from '../flavours/approve/types'
@@ -21,7 +22,9 @@ import { PsmConvertAction } from '../flavours/psm-convert/types'
 import { RepayAction, RepayObjective } from '../flavours/repay/types'
 import { SetUseAsCollateralAction, SetUseAsCollateralObjective } from '../flavours/set-use-as-collateral/types'
 import { SetUserEModeAction, SetUserEModeObjective } from '../flavours/set-user-e-mode/logic/types'
+import { StakeSparkAction, StakeSparkObjective } from '../flavours/stake-spark/types'
 import { StakeAction, StakeObjective } from '../flavours/stake/types'
+import { UnstakeSparkAction, UnstakeSparkObjective } from '../flavours/unstake-spark/types'
 import { UnstakeAction, UnstakeObjective } from '../flavours/unstake/types'
 import { UpgradeAction, UpgradeObjective } from '../flavours/upgrade/types'
 import { WithdrawFromSavingsAction, WithdrawFromSavingsObjective } from '../flavours/withdraw-from-savings/types'
@@ -50,6 +53,8 @@ export type Objective =
   | ClaimFarmRewardsObjective
   | ConvertStablesObjective
   | ClaimSparkRewardsObjective
+  | StakeSparkObjective
+  | UnstakeSparkObjective
 export type ObjectiveType = Objective['type']
 
 export type Action =
@@ -72,6 +77,8 @@ export type Action =
   | PsmConvertAction
   | ClaimFarmRewardsAction
   | ClaimSparkRewardsAction
+  | StakeSparkAction
+  | UnstakeSparkAction
 export type ActionType = Action['type']
 
 type BaseActionHandlerState<ErrorKind extends string> =
@@ -96,16 +103,12 @@ export interface BatchActionHandler {
   onAction: () => void
 }
 
-export interface ActionContext {
-  marketInfo?: MarketInfo
-  tokenRepository?: TokenRepository
-  savingsAccounts?: SavingsAccountRepository
-  permitStore?: PermitStore
-  farmsInfo?: FarmsInfo
+export interface ActionContext extends InjectedActionsContext {
   txReceipts: [Action, TransactionReceipt][]
   wagmiConfig: Config
   account: Address
   chainId: number
+  permitStore?: PermitStore
 }
 
 export type InitialParamsBase = { canBeSkipped: boolean }
@@ -115,7 +118,7 @@ type InitialParamsQueryOptions = UseQueryOptions<any, Error, InitialParamsBase, 
 export type InitialParamsQueryResult = UseQueryResult<InitialParamsBase>
 type VerifyTransactionQueryOptions = UseQueryOptions<any, Error, VerifyTransactionResultBase, QueryKey>
 export type VerifyTransactionResult = UseQueryResult<VerifyTransactionResultBase>
-export type GetWriteConfigResult = ContractFunctionParameters & { simulationBlockTag?: BlockTag }
+export type GetWriteConfigResult = ContractFunctionParameters
 
 export interface ActionConfig {
   initialParamsQueryOptions?: () => InitialParamsQueryOptions
@@ -123,13 +126,13 @@ export interface ActionConfig {
   verifyTransactionQueryOptions?: () => VerifyTransactionQueryOptions
   invalidates: () => QueryKey[]
   beforeWriteCheck?: () => void
+  onSuccessfulAction?: () => void
 }
 
 export interface InjectedActionsContext {
   marketInfo?: MarketInfo
   tokenRepository?: TokenRepository
-  savingsDaiInfo?: SavingsConverter
-  savingsUsdsInfo?: SavingsConverter
   farmsInfo?: FarmsInfo
   savingsAccounts?: SavingsAccountRepository
+  walletType?: WalletType
 }

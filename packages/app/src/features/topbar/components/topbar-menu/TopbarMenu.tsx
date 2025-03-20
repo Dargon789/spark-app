@@ -12,7 +12,7 @@ import { MenuItem, MenuItemIcon } from '@/ui/atoms/menu-item/MenuItem'
 import { Switch } from '@/ui/atoms/switch/Switch'
 import { links } from '@/ui/constants/links'
 import { BuildInfo } from '@/ui/utils/getBuildInfo'
-import { ExternalLinkIcon, MenuIcon, ScrollTextIcon, WandIcon } from 'lucide-react'
+import { ExternalLinkIcon, MenuIcon, ScrollTextIcon, ShieldIcon, WandIcon } from 'lucide-react'
 import { useState } from 'react'
 import { SparkRewardsSummary } from '../../types'
 import { TopbarAirdropProps } from '../topbar-airdrop/TopbarAirdrop'
@@ -67,7 +67,7 @@ export function TopbarMenu({
           >
             <div className="flex w-full items-center gap-2">
               <MenuItemIcon icon={WandIcon} />
-              Sandbox Mode
+              Sandbox
               <Switch checked={isInSandbox} className="ml-auto" />
             </div>
             <div className="typography-label-3 text-secondary">
@@ -80,6 +80,14 @@ export function TopbarMenu({
             <Link to={links.termsOfUse} variant="unstyled" external>
               <MenuItemIcon icon={ScrollTextIcon} />
               Terms of Service
+              <DropdownMenuItemIcon icon={ExternalLinkIcon} className="ml-auto" />
+            </Link>
+          </MenuItem>
+
+          <MenuItem asChild variant="secondary" className="cursor-pointer rounded-none p-6" withSeparator>
+            <Link to={links.privacyPolicy} variant="unstyled" external>
+              <MenuItemIcon icon={ShieldIcon} />
+              Privacy Policy
               <DropdownMenuItemIcon icon={ExternalLinkIcon} className="ml-auto" />
             </Link>
           </MenuItem>
@@ -112,7 +120,7 @@ export function TopbarMenu({
         >
           <div className="flex w-full items-center gap-2">
             <DropdownMenuItemIcon icon={WandIcon} />
-            Sandbox Mode
+            Sandbox
             <Switch checked={isInSandbox} className="ml-auto" />
           </div>
           <div className="typography-label-3 text-secondary">
@@ -125,6 +133,14 @@ export function TopbarMenu({
           <Link to={links.termsOfUse} variant="unstyled" external>
             <DropdownMenuItemIcon icon={ScrollTextIcon} />
             Terms of Service
+            <DropdownMenuItemIcon icon={ExternalLinkIcon} className="ml-auto" />
+          </Link>
+        </DropdownMenuItem>
+
+        <DropdownMenuItem asChild variant="secondary" className="cursor-pointer py-6">
+          <Link to={links.privacyPolicy} variant="unstyled" external>
+            <DropdownMenuItemIcon icon={ShieldIcon} />
+            Privacy Policy
             <DropdownMenuItemIcon icon={ExternalLinkIcon} className="ml-auto" />
           </Link>
         </DropdownMenuItem>

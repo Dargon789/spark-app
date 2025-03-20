@@ -1,12 +1,14 @@
 import { Path, paths } from '@/config/paths'
+import { ongoingCampaignsResponseSchema } from '@/domain/spark-rewards/ongoingCampaignsQueryOptions'
 import { TestnetClient } from '@marsfoundation/common-testnets'
 import { assert, CheckedAddress, assertNever, extractUrlFromClient } from '@marsfoundation/common-universal'
 import { Page } from '@playwright/test'
 import { generatePath } from 'react-router-dom'
 import { Address, Chain, Hash, parseEther, parseUnits } from 'viem'
+import { z } from 'zod'
 import { AssetsInTests, TOKENS_ON_FORK } from './constants'
 import { getTestnetContext } from './getTestnetContext'
-import { injectFlags, injectNetworkConfiguration, injectWalletConfiguration } from './injectSetup'
+import { injectFlags, injectNetworkConfiguration, injectWalletConfiguration, overrideRoutes } from './injectSetup'
 import { SetupSparkRewardsParams, setupSparkRewards } from './setupSparkRewards'
 import { generateAccount } from './utils'
 
@@ -44,6 +46,11 @@ export interface BlockchainOptions {
   chain: Chain
   blockNumber: bigint
 }
+
+export interface SparkRewardsConfig {
+  ongoingCampaigns: z.input<typeof ongoingCampaignsResponseSchema>
+}
+
 export interface SetupOptions<K extends Path, T extends ConnectionType> {
   blockchain: BlockchainOptions
   initialPage: K
@@ -51,6 +58,7 @@ export interface SetupOptions<K extends Path, T extends ConnectionType> {
   account: AccountOptions<T>
   skipInjectingNetwork?: boolean
   balanceOverrides?: Record<Address, Partial<Record<AssetsInTests, number>>>
+  sparkRewards?: SparkRewardsConfig
 }
 
 export type ProgressSimulation = (seconds: number) => Promise<void>
@@ -84,6 +92,10 @@ export async function setup<K extends Path, T extends ConnectionType>(
 
   const autoProgressSimulationController = await injectPageSetup({ page, testnetClient, options })
   const address = await setupAccount({ page, testnetClient, options: options.account })
+
+  if (options.sparkRewards) {
+    await setupSparkRewardsOngoingCampaigns(page, options.sparkRewards)
+  }
 
   async function progressSimulation(seconds: number): Promise<void> {
     const { timestamp: currentTimestamp } = await testnetClient.getBlock()
@@ -215,6 +227,7 @@ async function injectPageSetup({
   }
 
   await injectFlags(page, testnetClient, options.blockchain.chain.id)
+  await overrideRoutes(page)
 
   let autoSimulationProgressDelta: number | undefined
   await page.route(rpcUrl, async (route) => {
@@ -249,4 +262,13 @@ async function injectPageSetup({
 export interface AutoSimulationProgressController {
   enable: (deltaSeconds: number) => void
   disable: () => void
+}
+
+async function setupSparkRewardsOngoingCampaigns(page: Page, options: SparkRewardsConfig): Promise<void> {
+  await page.route(`${process.env.VITE_SPARK2_API_URL}/rewards/campaigns/`, async (route) => {
+    await route.fulfill({
+      status: 200,
+      body: JSON.stringify(options.ongoingCampaigns),
+    })
+  })
 }

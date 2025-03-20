@@ -1,5 +1,5 @@
 import { OracleInfoFetcherParams, OracleInfoFetcherResult } from '@/domain/oracles/oracleInfoFetchers'
-import { MyEarningsResult } from '@/domain/savings-charts/my-earnings-query/mainnet'
+import { MyEarningsResult } from '@/domain/savings-charts/my-earnings-query/types'
 import { SavingsRateQueryResult } from '@/domain/savings-charts/savings-rate-query/query'
 import { SavingsRateChartData } from '@/domain/savings-charts/savings-rate-query/types'
 import { SavingsConverterQueryOptions, SavingsConverterQueryParams } from '@/domain/savings-converters/types'
@@ -65,13 +65,9 @@ export type ReserveOracleType =
 
 export type SavingsConverterQuery = (args: SavingsConverterQueryParams) => SavingsConverterQueryOptions
 
-export interface DefaultAssetToBorrowConfig {
-  symbol: TokenSymbol
-  upgradeOptions: TokenSymbol[] | undefined
-}
-
 export interface MarketsConfig {
-  defaultAssetToBorrow: DefaultAssetToBorrowConfig
+  defaultAssetToBorrow: TokenSymbol
+  highlightedTokensToBorrow: TokenSymbol[]
   nativeAssetInfo: NativeAssetInfo
   tokenSymbolToReplacedName: TokenSymbolToNameReplacement
   oracles: Record<TokenSymbol, ReserveOracleType>

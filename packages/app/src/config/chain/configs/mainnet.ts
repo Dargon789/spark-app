@@ -81,7 +81,7 @@ export const mainnetConfig: ChainConfigEntry = {
   usdsSymbol: usds.symbol,
   susdsSymbol: susds.symbol,
   meta: {
-    name: 'Ethereum Mainnet',
+    name: 'Ethereum',
     logo: assets.chain.ethereum,
   },
   permitSupport: {
@@ -109,12 +109,14 @@ export const mainnetConfig: ChainConfigEntry = {
       deposit: [],
       borrow: [TokenSymbol('SPK')],
     },
+    [TokenSymbol('USDS')]: {
+      deposit: [],
+      borrow: [TokenSymbol('SPK')],
+    },
   },
   markets: {
-    defaultAssetToBorrow: {
-      symbol: dai.symbol,
-      upgradeOptions: [usds.symbol],
-    },
+    defaultAssetToBorrow: dai.symbol,
+    highlightedTokensToBorrow: [dai.symbol, usds.symbol, usdc.symbol],
     nativeAssetInfo: {
       nativeAssetName: 'Ethereum',
       wrappedNativeAssetSymbol: TokenSymbol('WETH'),

@@ -47,7 +47,7 @@ export async function setupSparkRewards({
   })
 
   await page.route(
-    `https://spark2-api.blockanalitica.com/api/v1/rewards/roots/${merkleRoot}/${account}/`,
+    `${process.env.VITE_SPARK2_API_URL}/rewards/roots/${mainnet.id}/${merkleRoot}/${account}/`,
     async (route) => {
       await route.fulfill({
         status: 200,
@@ -61,8 +61,8 @@ export async function setupSparkRewards({
               token_price: rewardTokenPrice?.toFixed() ?? null,
               pending_amount: '0',
               pending_amount_normalized: '0',
-              cumulative_amount: cumulativeAmountBaseUnit.toFixed(),
-              cumulative_amount_normalized: cumulativeAmount,
+              claimable_amount: cumulativeAmountBaseUnit.toFixed(),
+              claimable_amount_normalized: cumulativeAmount,
               proof:
                 proofs.find(({ token }) => token === tokenAddress)?.proof ??
                 raise(`Proof for token ${tokenSymbol} not found`),

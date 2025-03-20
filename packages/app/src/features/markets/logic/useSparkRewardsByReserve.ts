@@ -1,9 +1,8 @@
+import { transformSimplifiedQueryResult } from '@/domain/common/query'
 import { Reserve } from '@/domain/market-info/marketInfo'
 import { assignMarketSparkRewards } from '@/domain/spark-rewards/assignMarketSparkRewards'
-import { ongoingCampaignsQueryOptions } from '@/domain/spark-rewards/ongoingCampaignsQueryOptions'
+import { useOngoingCampaignsQuery } from '@/domain/spark-rewards/useOngoingCampaignsQuery'
 import { CheckedAddress } from '@marsfoundation/common-universal'
-import { useQuery } from '@tanstack/react-query'
-import { useConfig } from 'wagmi'
 import { MarketSparkRewards } from '../../../domain/spark-rewards/types'
 
 export interface UseSparkRewardsByReserveParams {
@@ -17,26 +16,28 @@ export type SparkRewardsByReserve = Record<
 >
 
 export function useSparkRewardsByReserve({ chainId, reserves }: UseSparkRewardsByReserveParams): SparkRewardsByReserve {
-  const wagmiConfig = useConfig()
+  const ongoingCampaignsResult = useOngoingCampaignsQuery()
 
-  const { data } = useQuery({
-    ...ongoingCampaignsQueryOptions({ wagmiConfig, chainId }),
-    select: (data) =>
-      reserves.reduce<SparkRewardsByReserve>((acc, reserve) => {
-        acc[reserve.token.address] = {
-          supply: assignMarketSparkRewards({
-            campaigns: data,
-            action: 'supply',
-            reserveTokenSymbol: reserve.token.symbol,
-          }),
-          borrow: assignMarketSparkRewards({
-            campaigns: data,
-            action: 'borrow',
-            reserveTokenSymbol: reserve.token.symbol,
-          }),
-        }
-        return acc
-      }, {}),
+  const { data } = transformSimplifiedQueryResult(ongoingCampaignsResult, (data) => {
+    const campaigns = data
+      .filter((campaign) => campaign.type === 'sparklend')
+      .filter((campaign) => campaign.chainId === chainId)
+
+    return reserves.reduce<SparkRewardsByReserve>((acc, reserve) => {
+      acc[reserve.token.address] = {
+        supply: assignMarketSparkRewards({
+          campaigns,
+          action: 'supply',
+          reserveTokenSymbol: reserve.token.symbol,
+        }),
+        borrow: assignMarketSparkRewards({
+          campaigns,
+          action: 'borrow',
+          reserveTokenSymbol: reserve.token.symbol,
+        }),
+      }
+      return acc
+    }, {})
   })
 
   return data ?? {}
