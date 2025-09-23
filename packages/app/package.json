@@ -108,7 +108,7 @@
     "@vitejs/plugin-react-swc": "^3.3.2",
     "@wagmi/cli": "^2.1.16",
     "autoprefixer": "^10.4.14",
-    "chromatic": "^11.5.4",
+    "chromatic": "^13.1.4",
     "dotenv": "^16.3.1",
     "globby": "^14.0.1",
     "http-server": "^14.1.1",
