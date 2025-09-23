@@ -1,7 +1,7 @@
 # App
 
-[![CI](https://github.com/marsfoundation/app-public/actions/workflows/ci.yml/badge.svg)](https://github.com/marsfoundation/app-public/actions/workflows/ci.yml)
-| [Production](https://app.spark.fi/)
+[![CircleCI](https://dl.circleci.com/status-badge/img/gh/Dargon789/spark-app/tree/main.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/Dargon789/spark-app/tree/main[Production](https://app.spark.fi/))
+
 
 ## Development
 
