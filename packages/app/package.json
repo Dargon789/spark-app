@@ -88,7 +88,7 @@
     "@storybook/addon-essentials": "^8.1.4",
     "@storybook/addon-interactions": "^8.1.4",
     "@storybook/addon-links": "^9.0.15",
-    "@storybook/addon-themes": "^8.1.4",
+    "@storybook/addon-themes": "^9.1.4",
     "@storybook/blocks": "^8.1.4",
     "@storybook/react": "^9.0.15",
     "@storybook/react-vite": "^9.1.4",
