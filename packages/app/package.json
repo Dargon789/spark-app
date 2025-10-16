@@ -25,7 +25,7 @@
   },
   "dependencies": {
     "@aave/math-utils": "^1.20.0",
-    "@hookform/resolvers": "^4.1.0",
+    "@hookform/resolvers": "^5.0.0",
     "@radix-ui/react-accordion": "^1.1.2",
     "@radix-ui/react-checkbox": "^1.0.4",
     "@radix-ui/react-collapsible": "^1.0.3",
