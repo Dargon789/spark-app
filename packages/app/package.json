@@ -63,7 +63,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
     "d3-array": "^3.2.4",
-    "deepmerge-ts": "^7.1.4",
+    "deepmerge-ts": "^8.0.0",
     "fetch-retry": "^6.0.0",
     "jsbi": "^4.3.0",
     "lucide-react": "^0.454.0",
@@ -114,7 +114,7 @@
     "http-server": "^14.1.1",
     "jsdom": "^22.1.0",
     "lokijs": "^1.5.12",
-    "postcss": "^8.4.47",
+    "postcss": "^8.5.23",
     "prop-types": "^15.8.1",
     "serve": "^14.2.1",
     "storybook": "^8.6.17",
@@ -126,7 +126,7 @@
     "vite": "^6.4.3",
     "vite-plugin-svgr": "^4.2.0",
     "vite-tsconfig-paths": "^4.3.1",
-    "vitest": "3.2.6"
+    "vitest": "3.2.7"
   },
   "size-limit": [
     {
